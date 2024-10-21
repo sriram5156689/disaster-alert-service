@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hazard Map and Prediction Report</title>
+    <title>Hazard Map</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
     <style>
         #map { height: 600px; }
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-        h1 { padding: 20px; text-align: center; background: #4CAF50; color: white; }
-        #hazard-info { padding: 20px; }
+        body { font-family: Arial, sans-serif; }
     </style>
 </head>
 <body>
@@ -19,71 +17,52 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
     <script>
-        // Get latitude and longitude from user input (replace with dynamic inputs in production)
+        // Set up map
         const latitude = parseFloat(prompt("Enter Latitude:"));
         const longitude = parseFloat(prompt("Enter Longitude:"));
-
-        // Set up map
         const map = L.map('map').setView([latitude, longitude], 10);
 
-        // Add Mapbox satellite tile layer (you need to replace {accessToken} with your actual Mapbox access token)
-        L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/256/{z}/{x}/{y}@2x?access_token=YOUR_MAPBOX_ACCESS_TOKEN', {
-            maxZoom: 19,
-            attribution: '&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> contributors'
+        // Add OpenStreetMap tile layer (satellite-like view from OpenTopoMap)
+        L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+            maxZoom: 17,
+            attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        // Add marker on the map at the given coordinates
+        // Add marker
         const marker = L.marker([latitude, longitude]).addTo(map);
         marker.bindPopup('Location: ' + latitude + ', ' + longitude).openPopup();
 
-        // Display latitude and longitude on the page
+        // Display latitude and longitude
         document.getElementById('lat').textContent = latitude;
         document.getElementById('lon').textContent = longitude;
 
-        // Mock hazard prediction data (you can replace this with an actual API call)
+        // Fetch hazard data from a mock API or replace with an actual hazard API
         async function fetchHazardData() {
             try {
-                // Example API call for hazard data (replace with actual hazard API URL)
-                const response = await fetch(https://api.example.com/hazards?lat=${latitude}&lon=${longitude});
-                
+                const response = await fetch(https://api.example.com/hazards?lat=${latitude}&lon=${longitude}); // Replace with the actual API endpoint
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
-
-                // Parse the hazard data
                 const data = await response.json();
-
-                // Mock data in case the API is unavailable
-                const hazardPrediction = {
-                    type: "Flood Risk",
-                    description: "High flood risk due to heavy rains in the area."
-                };
-
-                // Display hazard prediction report
-                displayHazardInfo([hazardPrediction]);
-
+                displayHazardInfo(data);
             } catch (error) {
-                console.error('Error fetching hazard data:', error);
-                document.getElementById('hazard-info').innerHTML = <p>Error fetching hazard data: ${error.message}</p>;
+                document.getElementById('hazard-info').innerHTML = '<p>Error fetching hazard data: ' + error.message + '</p>';
             }
         }
 
-        // Function to display hazard information
         function displayHazardInfo(data) {
             if (!data || data.length === 0) {
                 document.getElementById('hazard-info').innerHTML = '<p>No hazard data found for this location.</p>';
                 return;
             }
-
-            let infoHtml = '<h2>Hazard Prediction Report:</h2><ul>';
+            let infoHtml = '<h2>Hazard Information:</h2><ul>';
             data.forEach(hazard => {
-                infoHtml += <li><strong>${hazard.type}</strong>: ${hazard.description}</li>;
+                infoHtml += <li>${hazard.type}: ${hazard.description}</li>;
             });
             infoHtml += '</ul>';
             document.getElementById('hazard-info').innerHTML = infoHtml;
         }
 
-        // Call the function to fetch hazard data
         fetchHazardData();
     </script>
 </body>
