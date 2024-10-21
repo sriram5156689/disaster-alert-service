@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Result</title>
+    <script>
+        // Function to get query parameters from URL
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                latitude: params.get('latitude'),
+                longitude: params.get('longitude')
+            };
+        }
+
+        // Display the coordinates on the page
+        window.onload = function() {
+            const coords = getQueryParams();
+            document.getElementById('lat').innerText = coords.latitude;
+            document.getElementById('lon').innerText = coords.longitude;
+        };
+    </script>
+</head>
+<body>
+    <h1>Location Details</h1>
+    <p><strong>Latitude:</strong> <span id="lat"></span></p>
+    <p><strong>Longitude:</strong> <span id="lon"></span></p>
+
+    <!-- You can add more functionality here to display the location on a map, fetch data, etc. -->
+</body>
+</html>
